@@ -23,6 +23,30 @@ class star_client:
         json = '{ "data1": \"' + data + '\"}'
         return json
 
+    def post_file(self, end_point='/', file_path=None):
+        '''
+        Post a file into an endpoint for the given STARflex client defined in the class
+        :param end_point:
+        :param file_path:
+        :return:
+        '''
+        if file_path == None:
+            print "ERROR: You need to define a path to a existing file"
+            return
+
+        if not (end_point.startswith('/')):
+            end_point = '/' + end_point
+
+        if self.port.__eq__('80'):
+            url = 'http://' + self.host + end_point
+        else:
+            url = 'http://' + self.host + ':' + self.port + end_point
+        print "==> POST FILE TO URL : " + url
+        files = {'file': open(file_path, 'rb')}
+        r = requests.post(url, files=files)
+        print 'Status code: ' + str(r.status_code)
+        print 'status text:  ' + str(r.text)
+
     def post_msg(self, end_point='/', message='{}'):
         '''
         post any messge to an enpoing
@@ -42,11 +66,10 @@ class star_client:
             url = 'http://' + self.host + ':' + self.port + end_point
         print "==> URL : " + url
 
-
-        headers = {#'Connection ': 'keep-alive',
-                   # 'Content-Length': '170',
-                   'Content-Type': 'application/json',
-                   }
+        headers = {  # 'Connection ': 'keep-alive',
+            # 'Content-Length': '170',
+            'Content-Type': 'application/json',
+        }
 
         r = requests.post(url, data=None, headers=headers)
         print 'Status code: ' + str(r.status_code)
@@ -70,7 +93,7 @@ class star_client:
         r = requests.put(url)
         print r.status_code
         print r.text
-        return  r.text
+        return r.text
 
     def del_msg(self, end_point='/'):
         '''
@@ -105,13 +128,11 @@ class star_client:
         else:
             url = 'http://' + self.host + ':' + self.port + end_point
 
-
         r = requests.get(url, stream=True)
 
         if verbose:
             print "URL : " + url
             print r.status_code
-
 
         return r.text
 
@@ -178,7 +199,7 @@ class star_client:
                     if decoded_line.startswith("data: "):
                         # print "====>>>   decoded_line[6:]" + str(decoded_line[6:])
                         x = json.loads(decoded_line[6:])  # decodes json
-                        if not isinstance(x,list):
+                        if not isinstance(x, list):
                             last_sequence_number = sequence_number;
                             if x.has_key("seqNum"):
                                 sequence_number = x['seqNum']
@@ -188,7 +209,7 @@ class star_client:
                             if last_sequence_number == 0 & ~(sequence_number == 0):
                                 print "=====>>First sequence number : " + str(sequence_number)
                             elif sequence_number > last_sequence_number + 1:
-                                lost += sequence_number - last_sequence_number -1;
+                                lost += sequence_number - last_sequence_number - 1;
                                 print "lost sequence: " + str(lost)
                         else:
                             for xs in x:
@@ -234,10 +255,8 @@ class star_client:
                 # print tags
         return
 
-
-
     def decode_subs_item(self, xs):
-        self.rounds +=1
+        self.rounds += 1
         print('JSON loads type tagreaddata:  ' + str(xs))
         # the tag ID is found in the data field
         tag_key = xs['data'][6:-4]
@@ -290,4 +309,3 @@ class star_client:
 
     def stop_listening(self):
         self.external_break = True
-
