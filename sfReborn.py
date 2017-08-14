@@ -1,7 +1,15 @@
 import starflex
+import sys
 
-target = str(raw_input('Target IP : '))
-patchPath = str(raw_input('Patch path : '))
+print "This is the name of the script: ", sys.argv[0]
+print "Number of arguments: ", len(sys.argv)
+print "The arguments are: " , str(sys.argv)
+
+#target = str(raw_input('Target IP : '))
+#patchPath = str(raw_input('Patch path : '))
+target = sys.argv[1]
+patchPath = sys.argv[2]
+
 
 client = starflex.star_client(target)
 patchEndPoint = 'patch/'+patchPath.split('/')[-1]
